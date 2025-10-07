@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/suse-mono": "^5.2.1",
     "@heroicons/react": "^2.2.0",
+    "@react-oauth/google": "^0.12.2",
     "@tailwindcss/vite": "^4.1.13",
     "canvas-confetti": "^1.9.3",
     "firebase": "^12.2.1",
