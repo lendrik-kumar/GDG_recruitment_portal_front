@@ -1,4 +1,7 @@
-import React from 'react'
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Check, ArrowLeft } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
@@ -22,26 +25,28 @@ const BACKGROUND_IMAGES = [
 const FloatingImage = ({ index }) => {
   const styleRef = React.useRef(null);
   
-  const randomValues = React.useMemo(() => {
-    return {
-      size: Math.random() * (300 - 150) + 150,
-      left: Math.random() * 120 - 10,
-      top: Math.random() * 120 - 10,
-      delay: Math.random() * 10,
-      duration: Math.random() * (30 - 20) + 20,
-      rotation: Math.random() * 360, // Increased rotation range
-      image: BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)],
-      xDistance: Math.random() * 300 - 150,
-      yDistance: Math.random() * 300 - 150,
-      scale: 0.9 + Math.random() * 0.4,
-      initialRotation: Math.random() * 360 // Added initial rotation
-    };
-  }, []);
+  const randomValues = React.useMemo(() => ({
+    size: Math.random() * (300 - 150) + 150,
+    left: Math.random() * 120 - 10,
+    top: Math.random() * 120 - 10,
+    delay: Math.random() * 10,
+    duration: Math.random() * (30 - 20) + 20,
+    rotation: Math.random() * 360,
+    image: BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)],
+    xDistance: Math.random() * 300 - 150,
+    yDistance: Math.random() * 300 - 150,
+    scale: 0.9 + Math.random() * 0.4,
+    initialRotation: Math.random() * 360
+  }), []);
 
   useEffect(() => {
-    if (!styleRef.current) {
-      const style = document.createElement('style');
-      style.textContent = `
+    const styleId = `float-animation-${index}`;
+    let styleElement = document.getElementById(styleId);
+
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      styleElement.textContent = `
         @keyframes float${index} {
           0% {
             transform: translate(0, 0) rotate(${randomValues.initialRotation}deg) scale(1);
@@ -66,16 +71,16 @@ const FloatingImage = ({ index }) => {
           }
         }
       `;
-      document.head.appendChild(style);
-      styleRef.current = style;
+      document.head.appendChild(styleElement);
+      styleRef.current = styleElement;
     }
 
     return () => {
-      if (styleRef.current) {
+      if (styleRef.current && document.head.contains(styleRef.current)) {
         document.head.removeChild(styleRef.current);
       }
     };
-  }, []);
+  }, [index, randomValues]);
 
   return (
     <img
@@ -87,11 +92,9 @@ const FloatingImage = ({ index }) => {
         top: `${randomValues.top}%`,
         width: `${randomValues.size}px`,
         height: `${randomValues.size}px`,
-        // animation: `float${index} ${randomValues.duration}s infinite alternate-reverse ease-in-out`,
+        animation: `float${index} ${randomValues.duration}s infinite alternate-reverse ease-in-out`,
         animationDelay: `${randomValues.delay}s`,
-        transform: `rotate(${randomValues.initialRotation}deg)`, // Added initial rotation
-        // filter: 'brightness(0.85)',
-        // mixBlendMode: 'multiply',
+        transform: `rotate(${randomValues.initialRotation}deg)`,
         zIndex: index % 5
       }}
     />
@@ -106,42 +109,108 @@ const SubmissionSuccess = () => {
     Array.from({ length: 50 }, (_, i) => i)
   , []);
 
+  // Trigger confetti on component mount
+  React.useEffect(() => {
+    const duration = 3 * 1000;
+    const animationEnd = Date.now() + duration;
+
+    const randomInRange = (min, max) => {
+      return Math.random() * (max - min) + min;
+    }
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+      
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50;
+      
+      confetti({
+        particleCount,
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        origin: {
+          x: randomInRange(0.1, 0.9),
+          y: Math.random() - 0.2
+        },
+        colors: ['#FFD700', '#4CAF50', '#2196F3', '#9C27B0', '#FF9800'],
+        shapes: ['circle', 'square'],
+        gravity: 1.5,
+        scalar: 0.75,
+        drift: 0
+      });
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleBackToDashboard = () => {
     navigate("/");
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50/80 to-white/80 backdrop-blur-md flex items-center justify-center relative overflow-hidden">
-      {/* Blurred background overlay */}
-      <div className="absolute inset-0 backdrop-blur-sm z-10 bg-white/30" />
-      
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center relative overflow-hidden py-20">
       {/* Floating Background Images */}
       {floatingImages.map((index) => (
         <FloatingImage key={index} index={index} />
       ))}
 
-      {/* Success Card - increased z-index to appear above blur */}
-      <div className="bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-8 text-center max-w-md relative z-20">
-        <div className="mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Quiz Submitted Successfully!
-          </h1>
-          <p className="text-gray-600">Your answers have been recorded.</p>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.5,
+          type: "spring",
+          stiffness: 100
+        }}
+        className="relative z-20 w-full max-w-lg mx-4"
+      >
+        {/* Success Card */}
+        <div className="bg-white/90 z-20 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/20">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full 
+                     flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/30"
+          >
+            <Check className="w-12 h-12 text-white" />
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-center"
+          >
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-500 
+                         bg-clip-text text-transparent mb-4">
+              Quiz Submitted Successfully!
+            </h1>
+            <p className="text-gray-600 mb-8 text-lg">
+              Thank you for completing the quiz. Your responses have been recorded successfully.
+            </p>
+
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleBackToDashboard}
+              className="group flex items-center gap-2 mx-auto px-8 py-3 bg-gradient-to-r 
+                       from-blue-600 to-blue-700 text-white rounded-2xl font-medium 
+                       shadow-lg shadow-blue-500/30 hover:shadow-xl 
+                       hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+              Back to Dashboard
+            </motion.button>
+          </motion.div>
         </div>
-        <button 
-          onClick={handleBackToDashboard} 
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          Back to Dashboard
-        </button>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
-export default SubmissionSuccess
+export default SubmissionSuccess;

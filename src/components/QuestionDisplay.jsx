@@ -1,8 +1,8 @@
-import React from 'react';
+
 
 const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 mb-4 flex-1 w-full overflow-hidden flex flex-col">
+    <div className="bg-white rounded-2xl shadow-sm p-4 mb-4 flex-1 w-full overflow-hidden flex flex-col">
       <h1 className="text-xl font-semibold text-gray-900 mb-4">
         Question {question.questionNumber}
       </h1>
@@ -41,5 +41,4 @@ const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
     </div>
   );
 };
-
-export default QuestionDisplay;
+export default QuestionDisplay

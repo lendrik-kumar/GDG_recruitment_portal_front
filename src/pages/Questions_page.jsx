@@ -9,7 +9,17 @@ import { useNavigate } from 'react-router'
 const QuestionsPage = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [timeRemaining, setTimeRemaining] = useState(900);
+  const [timeRemaining, setTimeRemaining] = useState(() => {
+    const savedTime = localStorage.getItem('quizTimeRemaining');
+    const startTime = 900; // 15 minutes default
+    
+    if (!savedTime) {
+      localStorage.setItem('quizTimeRemaining', startTime.toString());
+      return startTime;
+    }
+    
+    return parseInt(savedTime);
+  });
   const [questionStatus, setQuestionStatus] = useState({
     1: { visited: true, attempted: false }
   });
@@ -49,26 +59,49 @@ const QuestionsPage = () => {
     fetchQuestions();
   }, []);
 
-  // Timer countdown
+  // Timer countdown with localStorage persistence
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleAutoSubmit();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    let timer = null;
 
-    return () => clearInterval(timer);
-  }, []);
+    if (!isQuizSubmitted && timeRemaining > 0) {
+      // Save current time immediately when component mounts or timeRemaining changes
+      localStorage.setItem('quizTimeRemaining', timeRemaining.toString());
+
+      timer = setInterval(() => {
+        setTimeRemaining(prev => {
+          const newTime = prev - 1;
+          localStorage.setItem('quizTimeRemaining', newTime.toString());
+          
+          if (newTime <= 0) {
+            clearInterval(timer);
+            handleAutoSubmit();
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [timeRemaining, isQuizSubmitted]);
+
+  // Add a cleanup effect when component unmounts
+  useEffect(() => {
+    return () => {
+      if (!isQuizSubmitted) {
+        localStorage.setItem('quizTimeRemaining', timeRemaining.toString());
+      }
+    };
+  }, [timeRemaining, isQuizSubmitted]);
 
   const handleAutoSubmit = () => {
     setIsQuizSubmitted(true);
-    // Submit answers to backend
+    localStorage.removeItem('quizTimeRemaining');
     submitAnswers();
+    navigate('/submission-success');
   };
 
   const handleOptionSelect = (optionIndex) => {
@@ -144,10 +177,9 @@ const QuestionsPage = () => {
 
   const handleSubmitConfirm = () => {
     setIsQuizSubmitted(true);
-    navigate('/submission-success')
+    localStorage.removeItem('quizTimeRemaining');
     submitAnswers();
-    // You can add a callback prop here to handle navigation in parent component
-    // onSubmitSuccess?.();
+    navigate('/submission-success');
   };
 
   const handleContinueTest = () => {

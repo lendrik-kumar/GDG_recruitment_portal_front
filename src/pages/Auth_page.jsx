@@ -3,33 +3,33 @@ import { useNavigate } from 'react-router';
 import image from "../assets/image.png";
 import gdsc from "../assets/gdsc.png";
 import rec_logo from "../assets/rec_logo.png";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { app } from "../../firebase";
 
 const AuthPage = () => {
-  const navigate = useNavigate()
-  const googleProvider = new GoogleAuthProvider()
-  const auth = getAuth(app)
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleGoogleLogin = async () => {
-    // signInWithPopup(auth, googleProvider)
+  
+    navigate("/instructions");
 
-    navigate('/instructions')
-
-  };
+  }
 
   return (
     <div className="h-screen overflow-hidden flex items-center justify-center relative">
-      {/* Background Image */}
+      {/* Background Image with subtle zoom */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${image})` }}
+        className="absolute inset-0 bg-cover bg-center animate-[zoom_20s_ease-in-out_infinite]"
+        style={{ 
+          backgroundImage: `url(${image})`,
+          animation: 'zoom 20s ease-in-out infinite'
+        }}
       />
 
-      {/* Login Card */}
-      <div className="relative z-10 bg-white rounded-[20px] p-10 max-w-xl w-full mx-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center">
+      {/* Login Card with entrance animation */}
+      <div className="relative z-10 bg-white rounded-[20px] p-10 max-w-xl w-full mx-8 
+                    shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-center
+                    animate-[fadeIn_0.6s_ease-out]">
         <div className="flex items-center justify-center mb-6">
           <img src="https://www.gdsctiet.in/assets/logo-CWLFsJqz.png"alt="Logo" className="h-10 mb-6 mr-4 w-10 object-contain" />
           <h1
@@ -51,7 +51,12 @@ const AuthPage = () => {
         <button
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-3 bg-blue-600 text-white py-3 rounded-md font-bold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full flex items-center justify-center gap-3 bg-blue-600 
+                   text-white py-3 rounded-md font-bold hover:bg-blue-700 
+                   transform transition-all duration-200 hover:scale-105 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 
+                   disabled:opacity-50 disabled:cursor-not-allowed 
+                   disabled:transform-none"
         >
           {isLoading ? (
             <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
@@ -75,12 +80,39 @@ const AuthPage = () => {
         </p>
       </div>
 
-      {/* GDSC Footer */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-        <img src={gdsc} alt="GDSC logo" className="h-10 w-auto object-contain" />
+      {/* GDSC Footer with float animation */}
+      <div
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 
+                  animate-[float_3s_ease-in-out_infinite] flex justify-center items-center"
+      >
+        <img
+          src={gdsc}
+          alt="GDSC logo"
+          className="h-10 w-auto object-contain"
+        />
       </div>
     </div>
   );
 };
+
+// Add these styles at the end of the file
+const styles = `
+  @keyframes zoom {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) translateX(-50%); }
+    50% { transform: translateY(-10px) translateX(-50%); }
+  }
+`;
+
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 export default AuthPage;

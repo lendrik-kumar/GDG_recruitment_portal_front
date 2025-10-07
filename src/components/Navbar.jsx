@@ -1,51 +1,97 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
+  const user = {email:"thapar@thapar.edu", displayName:"Thapar Student"};
+  const logout = {alert:()=>alert("Logged out")};
 
   useEffect(() => {
-    // Generate a random seed
     const randomSeed = Math.random().toString(36).substring(7);
-    const avatarStyle = 'avataaars'; // You can change this to any available style
+    const avatarStyle = 'avataaars';
     const url = `https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${randomSeed}`;
     setAvatarUrl(url);
   }, []);
 
   return (
-    <header className="bg-white/100 font-sans shadow-sm px-6 py-3 flex justify-between items-center">
-      {/* Left Logo Section */}
-      <div className="flex items-center gap-3 ml-10">
-        <div className="w-9 h-9 flex items-center justify-center rounded-full overflow-hidden">
-          <img
-            src="https://www.gdsctiet.in/assets/logo-CWLFsJqz.png"
-            alt="GDSC Logo"
-            className="object-contain"
-          />
-        </div>
-        <h1 className="text-lg open-sans font-sans font-semibold text-gray-800">
-          GDG Recruitment Portal
-        </h1>
-      </div>
-
-      {/* User Info */}
-      <div className="flex items-center gap-3 mr-10">
-        <div className="w-9 h-9 rounded-full overflow-hidden shadow-sm">
-          {avatarUrl && (
+    <motion.header 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      className="bg-gray-100 backdrop-blur-sm 
+                 border-b border-gray-200  px-6 py-4 sticky top-0 z-50"
+    >
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Left Logo Section */}
+        <motion.div 
+          className="flex items-center gap-4"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <motion.div 
+            className="w-10 h-10 bg-white rounded-2xl shadow-lg flex items-center justify-center
+                       hover:shadow-xl transition-shadow duration-300"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <img
-              src={avatarUrl}
-              alt="User Avatar"
-              className="w-full h-full object-cover"
+              src="https://www.gdsctiet.in/assets/logo-CWLFsJqz.png"
+              alt="GDSC Logo"
+              className="w-7 h-7 object-contain"
             />
-          )}
-        </div>
-        <div className="flex flex-col leading-tight">
-          <span className="font-medium font-serif text-gray-900 text-sm">
-            Hi, Thapar Student
-          </span>
-          <span className="text-gray-500 text-xs">student@thapar.edu</span>
-        </div>
+          </motion.div>
+          <div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 
+                          bg-clip-text text-transparent">
+              GDG Recruitment Portal
+            </h1>
+          </div>
+        </motion.div>
+
+        {/* User Info */}
+        <motion.div 
+          className="flex items-center gap-6"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-4">
+            <motion.div 
+              className="w-10 h-10 rounded-2xl overflow-hidden shadow-lg border-2 border-white"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {avatarUrl && (
+                <img
+                  src={avatarUrl}
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </motion.div>
+            <div className="flex flex-col">
+              <span className="font-semibold text-gray-800">
+                {user?.displayName || 'Thapar Student'}
+              </span>
+              <span className="text-sm text-gray-500">
+                {user?.email || 'student@thapar.edu'}
+              </span>
+            </div>
+          </div>
+
+          <motion.button
+            className="p-2 text-gray-500 hover:text-red-500 rounded-lg 
+                       hover:bg-red-50 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={logout}
+          >
+            <LogOut className="w-5 h-5" />
+          </motion.button>
+        </motion.div>
       </div>
-    </header>
+    </motion.header>
   );
 };
 

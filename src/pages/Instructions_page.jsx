@@ -2,34 +2,52 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { FaCheck } from "react-icons/fa";
 import { IoMdArrowRoundForward } from "react-icons/io";
-import Navbar from "../components/Navbar"; 
+import Navbar from "../components/Navbar";
+import toast, { Toaster } from 'react-hot-toast'; 
 
 const InstructionsPage = () => {
   const navigate = useNavigate();
   const [isChecked, setIsChecked] = useState(true);
+  const [isStarting, setIsStarting] = useState(false);
 
   const handleCheckboxToggle = () => setIsChecked(!isChecked);
 
   const handleBeginTest = () => {
-    if (isChecked) alert("Starting the test...");
-    navigate("/test");
+    if (!isChecked || isStarting) return;
+    
+    setIsStarting(true);
+    let countdown = 5;
+    
+    const timer = setInterval(() => {
+      if (countdown > 0) {
+        toast.success(`Test starting in ${countdown}...`, {
+          duration: 1000,
+          position: 'top-center',
+        });
+        countdown--;
+      } else {
+        clearInterval(timer);
+        navigate("/test");
+      }
+    }, 1000);
   };
 
   return (
     <div className="relative min-h-screen flex flex-col text-gray-800 overflow-hidden">
+      {/* Background with subtle movement */}
       <div
-        className="absolute inset-0 z-0 bg-no-repeat bg-[length:100%_100%]"
+        className="absolute inset-0 z-0 bg-no-repeat bg-[length:100%_100%] 
+                  animate-[backgroundFloat_15s_ease-in-out_infinite]"
         style={{
-          backgroundImage:
-            "url('https://www.gdsctiet.in/assets/Hero-Shapes-BeNsJ_j-.png')",
+          backgroundImage: "url('https://res.cloudinary.com/dhjknygdd/image/upload/v1759823471/Gemini_Generated_Image_pdxmyqpdxmyqpdxm_bcmuh0.png')",
         }}
       />
 
-      <div className="relative z-10 flex flex-col min-h-screen">
+      <div className="relative z-10 flex flex-col min-h-screen animate-[fadeIn_0.6s_ease-out]">
         <Navbar />
 
         <main className="flex-1 flex flex-col justify-center px-6 py-8 max-w-5xl mx-auto w-full">
-          <h2 className={`suse-mono text-3xl sm:text-4xl font-sans font-bold text-black mb-10 text-center`}>
+          <h2 className={`font-['Press_Start_2P'] bg-gray-100 rounded-2xl pt-5 pb-5 text-3xl sm:text-4xl font-bold text-black mb-10 text-center`}>
             Instructions & Guidelines
           </h2>
 
@@ -92,15 +110,16 @@ const InstructionsPage = () => {
 
             <button
               onClick={handleBeginTest}
-              disabled={!isChecked}
-              className={`flex items-center gap-2 font-['Press_Start_2P'] px-8 py-3 rounded-full text-base font-semibold transition-all duration-200 shadow-sm ${
-                isChecked
-                  ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md"
-                  : "bg-gray-300 text-gray-100 cursor-not-allowed"
-              }`}
+              disabled={!isChecked || isStarting}
+              className={`flex items-center gap-2 font-['Press_Start_2P'] px-8 py-3 rounded-full text-base 
+                    font-semibold transition-all duration-300 transform hover:scale-105 
+                    ${isChecked && !isStarting
+                      ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
+                      : "bg-gray-300 text-gray-100 cursor-not-allowed"}`}
             >
-              Begin Test
-              <IoMdArrowRoundForward className="text-xl" />
+              {isStarting ? 'Starting...' : 'Begin Test'}
+              <IoMdArrowRoundForward className={`text-xl transition-transform 
+                                          duration-300 group-hover:translate-x-1`} />
             </button>
           </div>
         </main>
@@ -113,5 +132,21 @@ const InstructionsPage = () => {
     </div>
   );
 };
+
+// Add animation keyframes
+const styles = `
+  @keyframes backgroundFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-5px, -5px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 export default InstructionsPage;
