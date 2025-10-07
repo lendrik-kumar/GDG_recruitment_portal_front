@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const InstructionsPage = () => {
   const navigate = useNavigate();
-  const [isChecked, setIsChecked] = useState(true);
+  const [isChecked, setIsChecked] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
 
   const handleCheckboxToggle = () => setIsChecked(!isChecked);
