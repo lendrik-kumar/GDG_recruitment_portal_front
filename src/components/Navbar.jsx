@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LogOut } from 'lucide-react';
+import useStore from '../store/store';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
-  const user = {email:"thapar@thapar.edu", displayName:"Thapar Student"};
-  const logout = {alert:()=>alert("Logged out")};
+  const navigate = useNavigate();
+  const user = useStore((state) => state.user);
+  const clearAuth = useStore((state) => state.clearAuth);
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate('/');
+  };
 
   useEffect(() => {
     const randomSeed = Math.random().toString(36).substring(7);
@@ -69,7 +77,7 @@ const Navbar = () => {
             </motion.div>
             <div className="flex flex-col">
               <span className="font-semibold text-gray-800">
-                {user?.displayName || 'Thapar Student'}
+                {user?.name || 'Thapar Student'}
               </span>
               <span className="text-sm text-gray-500">
                 {user?.email || 'student@thapar.edu'}
@@ -82,7 +90,7 @@ const Navbar = () => {
                        hover:bg-red-50 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={logout.alert}
+            onClick={handleLogout}
           >
             <LogOut className="w-5 h-5" />
           </motion.button>

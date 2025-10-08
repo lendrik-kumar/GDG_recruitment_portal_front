@@ -3,17 +3,62 @@ import { useNavigate } from 'react-router';
 import image from "../assets/image.png";
 import gdsc from "../assets/gdsc.png";
 import rec_logo from "../assets/rec_logo.png";
+import { auth, provider } from "../utils/firebase";
+import { signInWithPopup } from "firebase/auth";
+import apiClient from "../api/axios";
+import { toast } from 'sonner'
+import useStore from '../store/store'
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const setToken = useStore((state) => state.setToken)
+  const setUser = useStore((state) => state.setUser)
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleGoogleLogin = async () => {
-  
-    navigate("/instructions");
+    try {
+        setIsLoading(true)
+        setError("")
 
-  }
+        const result = await signInWithPopup(auth, provider)
+        const userEmail = result?.user?.email
+        const userName = result?.user?.displayName
+
+        if (!userEmail) {
+            toast.error("Unable to retrieve email from Google account")
+            throw new Error("Unable to retrieve email from Google account")
+        }
+
+        const response = await apiClient.post('/auth/google', {
+            email: userEmail,
+        })
+        
+        const { success, message, user, token } = response.data
+        
+        if (!success) {
+          setError(message || "Authentication failed")
+          toast.error(message || "Authentication failed")
+          return
+        }
+        
+        setToken(token)
+        setUser({
+            name: user?.name || userName || "Unknown User",
+            email: user?.email || userEmail || "Unknown Email",
+            isResuming: user?.hasStarted
+        })
+
+        navigate("/instructions")
+    } catch (error) {
+        console.error("Google Login Error:", error)
+        setError("Failed to sign in with Google")
+        toast.error("Failed to sign in with Google")
+    } finally {
+        setIsLoading(false)
+    }
+}
 
   return (
     <div className="h-screen overflow-hidden flex items-center justify-center relative">
