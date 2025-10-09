@@ -1,14 +1,15 @@
 
 
 const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 mb-4 flex-1 w-full overflow-hidden flex flex-col">
       <h1 className="text-xl font-semibold text-gray-900 mb-4">
-        Question {question.questionNumber}
+        QUESTION {question.id || 'N/A'}
       </h1>
       
       <p className="text-gray-700 text-base mb-6 leading-relaxed">
-        {question.questionText}
+        {question.question}
       </p>
 
       {/* Options */}

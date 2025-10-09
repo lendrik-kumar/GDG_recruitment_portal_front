@@ -20,6 +20,7 @@ const Navbar = () => {
         clearAuth();
         toast.success('Logged out successfully');
         navigate('/', { replace: true });
+        localStorage.removeItem('quizTimeRemaining');
       } else {
         throw new Error(response.data.message || 'Logout failed');
       }
