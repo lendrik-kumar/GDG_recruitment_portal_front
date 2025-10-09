@@ -4,6 +4,7 @@ import AuthPage from "./pages/Auth_page";
 import InstructionsPage from "./pages/Instructions_page";
 import QuestionsPage from "./pages/Questions_page";
 import SubmissionSuccess from "./pages/SubmissionSucess";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,17 +38,21 @@ const AnimatedRoutes = () => {
         <Route 
           path="/instructions" 
           element={
-            <PageTransition>
-              <InstructionsPage />
-            </PageTransition>
+            <ProtectedRoute>
+              <PageTransition>
+                <InstructionsPage />
+              </PageTransition>
+            </ProtectedRoute>
           } 
         />
         <Route 
           path="/test" 
           element={
-            <PageTransition>
-              <QuestionsPage />
-            </PageTransition>
+            <ProtectedRoute>
+              <PageTransition>
+                <QuestionsPage />
+              </PageTransition>
+            </ProtectedRoute>
           } 
         />
         <Route 

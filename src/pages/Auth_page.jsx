@@ -11,7 +11,6 @@ import useStore from '../store/store'
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  const setToken = useStore((state) => state.setToken)
   const setUser = useStore((state) => state.setUser)
 
   const [isLoading, setIsLoading] = useState(false);
@@ -31,11 +30,11 @@ const AuthPage = () => {
             throw new Error("Unable to retrieve email from Google account")
         }
 
-        const response = await apiClient.post('/auth/google', {
+        const response = await apiClient.post('/user/google', {
             email: userEmail,
         })
         
-        const { success, message, user, token } = response.data
+        const { success, message, user } = response.data
         
         if (!success) {
           setError(message || "Authentication failed")
@@ -43,13 +42,13 @@ const AuthPage = () => {
           return
         }
         
-        setToken(token)
         setUser({
-            name: user?.name || userName || "Unknown User",
-            email: user?.email || userEmail || "Unknown Email",
-            isResuming: user?.hasStarted
+            name: user.name,
+            email: user.email,
+            isResuming: user.isResuming
         })
 
+        toast.success(message)
         navigate("/instructions")
     } catch (error) {
         console.error("Google Login Error:", error)

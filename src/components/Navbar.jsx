@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { LogOut } from 'lucide-react';
 import useStore from '../store/store';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import apiClient from '../api/axios';
 
 const Navbar = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -10,9 +12,21 @@ const Navbar = () => {
   const user = useStore((state) => state.user);
   const clearAuth = useStore((state) => state.clearAuth);
 
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      const response = await apiClient.get('/user/logout');
+      
+      if (response.data.success) {
+        clearAuth();
+        toast.success('Logged out successfully');
+        navigate('/', { replace: true });
+      } else {
+        throw new Error(response.data.message || 'Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout Error:', error);
+      toast.error('Failed to logout. Please try again.');
+    }
   };
 
   useEffect(() => {
