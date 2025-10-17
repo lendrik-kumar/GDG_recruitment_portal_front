@@ -16,7 +16,7 @@ const InstructionsPage = () => {
     if (!isChecked || isStarting) return;
     
     setIsStarting(true);
-    let countdown = 5;
+    let countdown = 3;
     
     const timer = setInterval(() => {
       if (countdown > 0) {

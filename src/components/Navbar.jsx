@@ -65,8 +65,7 @@ const Navbar = () => {
             />
           </motion.div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 
-                          bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold text-black bg-clip-text">
               GDG Recruitment Portal
             </h1>
           </div>
