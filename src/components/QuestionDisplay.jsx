@@ -1,17 +1,22 @@
+const QuestionDisplay = ({ question, selectedOption, onOptionSelect, questionNumber }) => {
+  if (!question || !Array.isArray(question.options)) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm p-4 mb-4 flex-1 w-full flex items-center justify-center text-gray-500">
+        Loading question...
+      </div>
+    )
+  }
 
-
-const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 mb-4 flex-1 w-full overflow-hidden flex flex-col">
       <h1 className="text-xl font-semibold text-gray-900 mb-4">
-        Question {question.questionNumber}
+        QUESTION {questionNumber}
       </h1>
       
       <p className="text-gray-700 text-base mb-6 leading-relaxed">
-        {question.questionText}
+        {question.question}
       </p>
 
-      {/* Options */}
       <div className="space-y-3 flex-1 overflow-y-auto">
         {question.options.map((option, index) => (
           <div
@@ -24,11 +29,13 @@ const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
             onClick={() => onOptionSelect(index)}
           >
             <div className="flex items-center gap-4 w-full">
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                selectedOption === index
-                  ? 'border-blue-500 bg-blue-500'
-                  : 'border-gray-400'
-              }`}>
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  selectedOption === index
+                    ? 'border-blue-500 bg-blue-500'
+                    : 'border-gray-400'
+                }`}
+              >
                 {selectedOption === index && (
                   <div className="w-2 h-2 bg-white rounded-full"></div>
                 )}
@@ -39,6 +46,7 @@ const QuestionDisplay = ({ question, selectedOption, onOptionSelect }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
+
 export default QuestionDisplay

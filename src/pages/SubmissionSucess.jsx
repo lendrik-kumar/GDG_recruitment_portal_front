@@ -148,6 +148,7 @@ const SubmissionSuccess = () => {
   }, []);
 
   const handleBackToDashboard = () => {
+    localStorage.removeItem("quizStartTime");
     navigate("/");
   };
 

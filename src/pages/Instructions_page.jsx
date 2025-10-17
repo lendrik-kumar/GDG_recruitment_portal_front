@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 const InstructionsPage = () => {
   const navigate = useNavigate();
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
 
   const handleCheckboxToggle = () => setIsChecked(!isChecked);
@@ -16,7 +16,7 @@ const InstructionsPage = () => {
     if (!isChecked || isStarting) return;
     
     setIsStarting(true);
-    let countdown = 5;
+    let countdown = 3;
     
     const timer = setInterval(() => {
       if (countdown > 0) {
