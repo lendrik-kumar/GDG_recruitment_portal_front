@@ -22,19 +22,29 @@ const AuthPage = () => {
         setError("")
 
         const result = await signInWithPopup(auth, provider)
-        const userEmail = result?.user?.email
-        const userName = result?.user?.displayName
+        const user = result?.user
 
-        if (!userEmail) {
-            toast.error("Unable to retrieve email from Google account")
-            throw new Error("Unable to retrieve email from Google account")
+        if (!user || !user.email) {
+            toast.error("Unable to retrieve user information from Google account")
+            throw new Error("Unable to retrieve user information from Google account")
         }
 
-        const response = await apiClient.post('/user/google', {
-            email: userEmail,
+        // Get Firebase ID token
+        const idToken = await user.getIdToken()
+        
+        if (!idToken) {
+            toast.error("Unable to get authentication token")
+            throw new Error("Unable to get authentication token")
+        }
+
+        // Send ID token to backend for verification
+        const response = await apiClient.post('/user/firebase-auth', {}, {
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            }
         })
         
-        const { success, message, user } = response.data
+        const { success, message, user: userData } = response.data
         
         if (!success) {
           setError(message || "Authentication failed")
@@ -43,9 +53,10 @@ const AuthPage = () => {
         }
         
         setUser({
-            name: user.name,
-            email: user.email,
-            isResuming: user.isResuming
+            uid: userData.uid,
+            name: userData.name,
+            email: userData.email,
+            isResuming: userData.isResuming
         })
 
         toast.success(message)
